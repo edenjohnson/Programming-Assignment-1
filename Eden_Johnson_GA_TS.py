@@ -12,9 +12,7 @@ for i in range(len(cities)):
     index_dict[i] = cities[i]
 
 
-# perform Crossover
-parent1 = [0, 1, 2, 3, 4, 5, 6, 7]
-parent2 = [7, 6, 5, 4, 3, 2, 1, 0]
+
 
 def crossover(parent1, parent2):
     """ Performs crossover between two parents and returns 2 children. """
@@ -50,9 +48,7 @@ def crossover(parent1, parent2):
 
     return [child1, child2]
 
-children = crossover(parent1, parent2)
 
-# perform mutation
 def mutation(children):
     """ Performs point switch mutation on a child and returns the mutated child. """
     mutated_children = []
@@ -66,7 +62,7 @@ def mutation(children):
         mutated_children.append(child)
     return mutated_children
 
-mutated_children = mutation(children)
+
 
 def fitness(mutated_children):
     """ Function takes in a list of mutated children and calculates their fitness. Stores data in a dictionary """
@@ -97,15 +93,23 @@ def fitness(mutated_children):
 
     return fitness_dict
 
-fitness_dict = fitness(mutated_children)
 
 
 
 def ga_call(generations, percent_population_selected, population_size, progress_file_name, results_file_name):
     """ Function calls the genetic algorithm for the amount of times specified. """
+    # create parents
+    parent1 = [0, 1, 2, 3, 4, 5, 6, 7]
+    parent2 = [7, 6, 5, 4, 3, 2, 1, 0]
 
+    # perform Crossover
+    children = crossover(parent1, parent2)
 
+    # perform mutation
+    mutated_children = mutation(children)
 
+    # calculate fitness
+    fitness_dict = fitness(mutated_children)
 
 
 distance_matrix_path = 'TS_Distances_Between_Cities.csv'

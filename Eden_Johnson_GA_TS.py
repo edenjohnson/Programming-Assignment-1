@@ -68,34 +68,45 @@ def mutation(children):
 
 mutated_children = mutation(children)
 
+def fitness(mutated_children):
+    """ Function takes in a list of mutated children and calculates their fitness. Stores data in a dictionary """
+    fitness_dict = {}
+    child1_fitness = 0
+    child2_fitness = 0
 
-child1_fitness = 0
-child2_fitness = 0
+    new_city_list_child_1 = []
+    new_city_list_child_2 = []
+    for i in range(len(mutated_children[0])):
+        city = index_dict[mutated_children[0][i]]
+        new_city_list_child_1.append(city)
 
-new_city_list_child_1 = []
-new_city_list_child_2 = []
-for i in range(len(mutated_children[0])):
-    city = index_dict[mutated_children[0][i]]
-    new_city_list_child_1.append(city)
+    # look up distance metrics for child in table
+    for i in range(len(new_city_list_child_1) - 1):
+        child1_fitness += distance_df[new_city_list_child_1[i]][mutated_children[0][i + 1]]
 
-# look up distance metrics for child in table
-for i in range(len(new_city_list_child_1) - 1):
-    child1_fitness += distance_df[new_city_list_child_1[i]][mutated_children[0][i + 1]]
+    for i in range(len(mutated_children[1])):
+        city = index_dict[mutated_children[1][i]]
+        new_city_list_child_2.append(city)
 
+    # look up distance metrics for child in table
+    for i in range(len(new_city_list_child_2) - 1):
+        child2_fitness += distance_df[new_city_list_child_2[i]][mutated_children[1][i + 1]]
 
-for i in range(len(mutated_children[1])):
-    city = index_dict[mutated_children[1][i]]
-    new_city_list_child_2.append(city)
+    fitness_dict[mutated_children[0]] = child1_fitness
+    fitness_dict[mutated_children[1]] = child2_fitness
 
-# look up distance metrics for child in table
-for i in range(len(new_city_list_child_2) - 1):
-    child2_fitness += distance_df[new_city_list_child_2[i]][mutated_children[1][i + 1]]
+    return fitness_dict
 
-
+fitness_dict = fitness(mutated_children)
 
 
-def ga_call(generations, percent_population_selected, population_size):
+
+def ga_call(generations, percent_population_selected, population_size, progress_file_name, results_file_name):
     """ Function calls the genetic algorithm for the amount of times specified. """
+
+
+
+
 
 distance_matrix_path = 'TS_Distances_Between_Cities.csv'
 generations = 50

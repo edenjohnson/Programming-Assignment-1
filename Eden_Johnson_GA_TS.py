@@ -88,28 +88,59 @@ def fitness(mutated_children):
     for i in range(len(new_city_list_child_2) - 1):
         child2_fitness += distance_df[new_city_list_child_2[i]][mutated_children[1][i + 1]]
 
-    fitness_dict[mutated_children[0]] = child1_fitness
-    fitness_dict[mutated_children[1]] = child2_fitness
+    fitness_dict["child1"] = [mutated_children[0], int(child1_fitness)]
+    fitness_dict["child2"] = [mutated_children[1], int(child2_fitness)]
 
     return fitness_dict
 
 
 
 
-def ga_call(generations, percent_population_selected, population_size, progress_file_name, results_file_name):
+def ga_call(generations, percent_population_selected, population_size,progress_file_name):
     """ Function calls the genetic algorithm for the amount of times specified. """
+    pop = int(population_size / 2)
     # create parents
-    parent1 = [0, 1, 2, 3, 4, 5, 6, 7]
-    parent2 = [7, 6, 5, 4, 3, 2, 1, 0]
+    parent1 = random.sample(range(8), 8)
+    parent2 = random.sample(range(8), 8)
+    open_progress_file = open(progress_file_name, 'w')
 
-    # perform Crossover
-    children = crossover(parent1, parent2)
+    # Complete as my iterations as there are generations
+    for generation in range(1, generations + 1):
+        # divide population size by 2 since each crossover results in 2 children, only need to call function 50 xs
+        population_dict = {}
+        child_num = 1
+        for i in range(pop):
+            # perform Crossover
+            children = crossover(parent1, parent2)
 
-    # perform mutation
-    mutated_children = mutation(children)
+            # perform mutation
+            mutated_children = mutation(children)
 
-    # calculate fitness
-    fitness_dict = fitness(mutated_children)
+            # calculate fitness
+            fitness_dict = fitness(mutated_children)
+            for key, value in fitness_dict.items():
+                population_dict["Child " + str(child_num)] = value
+                child_num+=1
+
+        df = pd.DataFrame(population_dict)
+        df.index = ["path", "fitness"]
+        df = df.transpose()
+        new_df = df.drop(columns=["path"])
+        average_fitness_scores = new_df.mean()[0]
+        median_fitness_scores = new_df.median()[0]
+        std_fitness_scores = new_df.std()[0]
+        open_progress_file.write(str(generation) + ". " + "Population Size: " + str(population_size) + " for iteration " + str(generation) + "\n")
+        open_progress_file.write("Average fitness scores " + str(average_fitness_scores) + "\n")
+        open_progress_file.write("Median fitness scores " + str(median_fitness_scores) + "\n")
+        open_progress_file.write("STD fitness scores " + str(std_fitness_scores) + "\n")
+        open_progress_file.write("Size of the selected subset of the population " + str(percent_population_selected) + "\n\n")
+
+    open_progress_file.close()
+
+
+
+
+
 
 
 distance_matrix_path = 'TS_Distances_Between_Cities.csv'
@@ -119,3 +150,4 @@ population_size = 100
 progress_file_name = "Eden_Johnson_GA_TS_Info.txt"
 results_file_name = "Eden_Johnson_GA_TS_Result.txt"
 
+ga_call(generations, percent_population_selected, population_size, progress_file_name)

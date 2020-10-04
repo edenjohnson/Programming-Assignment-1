@@ -5,7 +5,6 @@ import random, operator
 
 distance_csv = pd.read_csv('TS_Distances_Between_Cities.csv', ',', index_col=0)
 distance_df = distance_csv.dropna()
-cities_dict = distance_df.to_dict()
 cities = distance_df.columns.to_list()
 
 index_dict = {}
@@ -152,7 +151,6 @@ def ga_call(generations, percent_population_selected, population_size,progress_f
 
     open_result_file.close()
     open_progress_file.close()
-
 
 
 distance_matrix_path = 'TS_Distances_Between_Cities.csv'

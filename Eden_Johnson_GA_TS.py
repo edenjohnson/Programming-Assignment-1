@@ -47,7 +47,7 @@ def crossover(parent1, parent2):
 
 
 def mutation(children):
-    """ Performs point switch mutation on a child and returns the mutated child. """
+    """ Performs a mutation on a child and returns a list of mutated children. """
     mutated_children = []
     for child in children:
         possible_first_index = random.randint(0, 7)

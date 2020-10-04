@@ -2,6 +2,12 @@ import pandas as pd
 import numpy as np
 import random, operator
 
+import tsp
+import ga_crossover
+import ga_mutation
+
+
+
 distance_csv = pd.read_csv('TS_Distances_Between_Cities.csv', ',', index_col=0)
 distance_df = distance_csv.dropna()
 cities_dict = distance_df.to_dict()
@@ -10,9 +16,6 @@ cities = distance_df.columns.to_list()
 index_dict = {}
 for i in range(len(cities)):
     index_dict[i] = cities[i]
-
-
-
 
 def crossover(parent1, parent2):
     """ Performs crossover between two parents and returns 2 children. """
@@ -60,6 +63,7 @@ def mutation(children):
         child[possible_first_index] = second_value
         child[possible_second_index] = first_value
         mutated_children.append(child)
+
     return mutated_children
 
 
@@ -96,13 +100,14 @@ def fitness(mutated_children):
 
 
 
-def ga_call(generations, percent_population_selected, population_size,progress_file_name):
+def ga_call(generations, percent_population_selected, population_size,progress_file_name, results_file_name):
     """ Function calls the genetic algorithm for the amount of times specified. """
     pop = int(population_size / 2)
     # create parents
     parent1 = random.sample(range(8), 8)
     parent2 = random.sample(range(8), 8)
     open_progress_file = open(progress_file_name, 'w')
+    lowest_each_gen = {}
 
     # Complete as my iterations as there are generations
     for generation in range(1, generations + 1):
@@ -125,16 +130,31 @@ def ga_call(generations, percent_population_selected, population_size,progress_f
         df = pd.DataFrame(population_dict)
         df.index = ["path", "fitness"]
         df = df.transpose()
-        new_df = df.drop(columns=["path"])
-        average_fitness_scores = new_df.mean()[0]
-        median_fitness_scores = new_df.median()[0]
-        std_fitness_scores = new_df.std()[0]
+        sub_set = df.sort_values(by="fitness", ascending=True)[:40]
+        smallest_of_sub = sub_set.iloc[[0]]
+        lowest_each_gen[smallest_of_sub.index[0]] = [smallest_of_sub["path"][0], smallest_of_sub["fitness"][0]]
+
+        average_fitness_scores = sub_set["fitness"].mean()
+        median_fitness_scores = sub_set["fitness"].median()
+        std_fitness_scores = sub_set["fitness"].std()
         open_progress_file.write(str(generation) + ". " + "Population Size: " + str(population_size) + " for iteration " + str(generation) + "\n")
         open_progress_file.write("Average fitness scores " + str(average_fitness_scores) + "\n")
         open_progress_file.write("Median fitness scores " + str(median_fitness_scores) + "\n")
         open_progress_file.write("STD fitness scores " + str(std_fitness_scores) + "\n")
         open_progress_file.write("Size of the selected subset of the population " + str(percent_population_selected) + "\n\n")
 
+    key_min = min(lowest_each_gen.keys(), key=(lambda k: lowest_each_gen[k][1]))
+    best_path = lowest_each_gen[key_min][0]
+    best_city_list = []
+    for city in best_path:
+        best_city_list.append(index_dict[city])
+
+    open_result_file = open(results_file_name, 'w')
+    for i in range(len(best_path)):
+        open_result_file.write(str(best_path[i]) + " " + best_city_list[i] + "\n")
+
+    print(lowest_each_gen[key_min][1])
+    open_result_file.close()
     open_progress_file.close()
 
 
@@ -150,4 +170,4 @@ population_size = 100
 progress_file_name = "Eden_Johnson_GA_TS_Info.txt"
 results_file_name = "Eden_Johnson_GA_TS_Result.txt"
 
-ga_call(generations, percent_population_selected, population_size, progress_file_name)
+ga_call(generations, percent_population_selected, population_size, progress_file_name, results_file_name)

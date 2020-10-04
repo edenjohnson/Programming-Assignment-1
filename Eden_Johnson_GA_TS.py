@@ -2,11 +2,6 @@ import pandas as pd
 import numpy as np
 import random, operator
 
-import tsp
-import ga_crossover
-import ga_mutation
-
-
 
 distance_csv = pd.read_csv('TS_Distances_Between_Cities.csv', ',', index_col=0)
 distance_df = distance_csv.dropna()
@@ -107,7 +102,8 @@ def ga_call(generations, percent_population_selected, population_size,progress_f
     parent1 = random.sample(range(8), 8)
     parent2 = random.sample(range(8), 8)
     open_progress_file = open(progress_file_name, 'w')
-    lowest_each_gen = {}
+    most_fit_path = []
+    most_fit_score = 10000000
 
     # Complete as my iterations as there are generations
     for generation in range(1, generations + 1):
@@ -132,7 +128,10 @@ def ga_call(generations, percent_population_selected, population_size,progress_f
         df = df.transpose()
         sub_set = df.sort_values(by="fitness", ascending=True)[:40]
         smallest_of_sub = sub_set.iloc[[0]]
-        lowest_each_gen[smallest_of_sub.index[0]] = [smallest_of_sub["path"][0], smallest_of_sub["fitness"][0]]
+
+        if smallest_of_sub["fitness"][0] < most_fit_score:
+            most_fit_score = smallest_of_sub["fitness"][0]
+            most_fit_path = smallest_of_sub["path"][0]
 
         average_fitness_scores = sub_set["fitness"].mean()
         median_fitness_scores = sub_set["fitness"].median()
@@ -143,23 +142,16 @@ def ga_call(generations, percent_population_selected, population_size,progress_f
         open_progress_file.write("STD fitness scores " + str(std_fitness_scores) + "\n")
         open_progress_file.write("Size of the selected subset of the population " + str(percent_population_selected) + "\n\n")
 
-    key_min = min(lowest_each_gen.keys(), key=(lambda k: lowest_each_gen[k][1]))
-    best_path = lowest_each_gen[key_min][0]
     best_city_list = []
-    for city in best_path:
+    for city in most_fit_path:
         best_city_list.append(index_dict[city])
 
     open_result_file = open(results_file_name, 'w')
-    for i in range(len(best_path)):
-        open_result_file.write(str(best_path[i]) + " " + best_city_list[i] + "\n")
+    for i in range(len(most_fit_path)):
+        open_result_file.write(str(most_fit_path[i]) + " " + best_city_list[i] + "\n")
 
-    print(lowest_each_gen[key_min][1])
     open_result_file.close()
     open_progress_file.close()
-
-
-
-
 
 
 

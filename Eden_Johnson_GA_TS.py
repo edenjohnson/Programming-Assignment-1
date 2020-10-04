@@ -63,7 +63,8 @@ def mutation(children):
 
 
 def fitness(mutated_children):
-    """ Function takes in a list of mutated children and calculates their fitness. Stores data in a dictionary """
+    """ Function takes in a list of mutated children and calculates their fitness. Stores data in a dictionary that is
+        returned. """
     fitness_dict = {}
     child1_fitness = 0
     child2_fitness = 0
@@ -95,7 +96,8 @@ def fitness(mutated_children):
 
 
 def ga_call(generations, percent_population_selected, population_size,progress_file_name, results_file_name):
-    """ Function calls the genetic algorithm for the amount of times specified. """
+    """ Full GA call with crossover, mutation, and fitness calculation steps. Creates progress file
+        for the specified number of generations and a result file with the optimal path. """
     pop = int(population_size / 2)
     # create parents
     parent1 = random.sample(range(8), 8)

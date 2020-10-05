@@ -99,9 +99,15 @@ def ga_call(generations, percent_population_selected, population_size,progress_f
     """ Full GA call with crossover, mutation, and fitness calculation steps. Creates progress file
         for the specified number of generations and a result file with the optimal path. """
     pop = int(population_size / 2)
-    # create parents
-    parent1 = random.sample(range(8), 8)
-    parent2 = random.sample(range(8), 8)
+    # create parents from an initial random population
+    initial_population = [random.sample(range(8), 8) for i in range(population_size)]
+    potential_parent_1_index = random.randint(0, 99)
+    potential_parent_2_index = random.randint(0, 99)
+    while potential_parent_1_index == potential_parent_2_index:
+        potential_parent_2_index = random.randint(0, 99)
+
+    parent1 = initial_population[potential_parent_1_index]
+    parent2 = initial_population[potential_parent_2_index]
     open_progress_file = open(progress_file_name, 'w')
     most_fit_path = []
     most_fit_score = 10000000
